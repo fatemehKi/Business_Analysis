@@ -1,18 +1,18 @@
 '
 /**
 * @file Project.r 
-* @The goal of the project is to explore data Data set data set is about direct marketing campaigns of a Portuguese banking institution. 
+* @The goal of the project is to explore data Data set of the MEC Retail company for the test2 purpose
 * @author fatemeh Kiaie
 * @Contact: f.kiaie@gmail.com
 **/
 '
-
+install.packages('ggplot2')
+library(ggplot2)
 library(ggplot)
 library(dplyr)
-library(tidyr)
 
 ##############Loading Data######################################
-MyData = read.csv(file="D:\\Metro College\\BA\\Project\\MEC_Retail-SalesMarketing_-ProfitCost.csv", header=TRUE, sep=",")
+MyData = read.csv(file="C:\\Users\\mfatemeh\\Desktop\\BA\\MEC_Retail-SalesMarketing_-ProfitCost.csv", header=TRUE, sep=",")
 attach(MyData)
 
 ############Finding Number of the missing###################### 
@@ -22,10 +22,33 @@ sapply(MyData, function(x) sum(is.na(x)))
 #####Data of 2018 and 2017 (used for growth calculation)#######
 MyData$Revenue_1 = as.numeric(MyData$Revenue)
 MyData$profit_1 = as.numeric(MyData$Gross.profit)
+MyData$Planned_revenue_1=as.numeric(MyData$Planned.revenue)
+
 MyData_2018 = MyData[MyData$Year == '2018',]
 MyData_2017 = MyData[MyData$Year == '2017',]
+MyData_2016 = MyData[MyData$Year == '2016',]
+MyData_2015 = MyData[MyData$Year == '2015',]
+
+##############Growth Trend over the year######################
+Revenue_Gr_ye=aggregate(MyData$Revenue_1, by=list(MyData$Year), sum)
+Plan_Revenue_Gr_ye=aggregate(MyData$Planned_revenue_1, by=list(MyData$Year), sum)
+yrly_Data_r=as.data.frame(Revenue_Gr_ye)
+colnames(yrly_Data_r)=c('Year', 'Total_Revenue')
 
 
+yrly_Data_p=as.data.frame(Plan_Revenue_Gr_ye)
+colnames(yrly_Data_p)=c('Year', 'Total_Planned_Re')
+
+yrly_Data_r$Planned_revenue_1=yrly_Data_p$Total_Planned_Re 
+
+
+dev.off()
+windows()
+g = ggplot(yrly_Data_r, aes(x=Year))
+g = g + geom_line(aes(y=yrly_Data_r$Total_Revenue), colour="red")
+g = g + geom_line(aes(y=yrly_Data_r$Planned_revenue_1), colour="green")
+g = g+  xlab("Year") + ylab("Revenue")
+g
 #############################################Finding the Top Profit and Revenue####################################
 ############Maximum Country in Revenue ##########################
 Top_Re_Cou=aggregate(MyData$Revenue_1, by=list(MyData$Retailer.country), sum)
@@ -90,10 +113,9 @@ Top_Pr_Cou=aggregate(MyData$profit_1, by=list(MyData$Retailer.country), sum)
 Top_Cou_p=as.data.frame(Top_Pr_Cou)
 colnames(Top_Cou_p)=c('Country_Category', 'Total_Profit')
 
-dev.off()
 windows()
 MP_C = ggplot(Top_Cou_p, aes(x = reorder(Country_Category, -Total_Profit), y = Total_Profit))
-MP_C = MP_C + geom_bar(stat="identity", color='red',fill='red')
+MP_C = MP_C + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MP_C = MP_C + theme(axis.text.x=element_text(angle=45, hjust=1))
 MP_C
 
@@ -104,7 +126,7 @@ colnames(Top_PL_p)=c('Product_Line_Category', 'Total_Profit')
 
 windows()
 MP_PL = ggplot(Top_PL_p, aes(x = reorder(Product_Line_Category, -Total_Profit), y = Total_Profit))
-MP_PL = MP_PL + geom_bar(stat="identity", color='red',fill='red')
+MP_PL = MP_PL + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MP_PL = MP_PL + theme(axis.text.x=element_text(angle=45, hjust=1))
 MP_PL
 
@@ -115,7 +137,7 @@ colnames(Top_PT_p)=c('Product_Type_Category', 'Total_Profit')
 
 windows()
 MP_PT = ggplot(Top_PT_p, aes(x = reorder(Product_Type_Category, -Total_Profit), y = Total_Profit))
-MP_PT = MP_PT + geom_bar(stat="identity", color='red',fill='red')
+MP_PT = MP_PT + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MP_PT = MP_PT + theme(axis.text.x=element_text(angle=45, hjust=1))
 MP_PT
 
@@ -127,7 +149,7 @@ colnames(Top_P_p)=c('Product_Category', 'Total_Profit')
 
 windows()
 MP_P = ggplot(Top_P_p, aes(x = reorder(Product_Category, -Total_Profit), y = Total_Profit))
-MP_P = MP_P + geom_bar(stat="identity", color='indianred',fill='red')
+MP_P = MP_P + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MP_P = MP_P + theme(axis.text.x=element_text(angle=45, hjust=1))
 MP_P
 
@@ -138,11 +160,11 @@ colnames(Top_M_p)=c('Product_Method_Category', 'Total_Profit')
 
 windows()
 MP_M = ggplot(Top_M_p, aes(x = reorder(Product_Method_Category, -Total_Profit), y = Total_Profit))
-MP_M = MP_M + geom_bar(stat="identity", color='red',fill='red')
+MP_M = MP_M + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MP_M = MP_M + theme(axis.text.x=element_text(angle=45, hjust=1))
 MP_M
 
-###############################################Most Expensive in Product Line####################
+###############################################Most Expensive in Product Line################################
 MyData_2 = read.csv(file="D:\\Metro College\\BA\\Project\\Project_sheet.csv", header=TRUE, sep=",")
 MyData_2=na.omit(MyData_2)
 MyData_2$Unit.price = as.numeric(MyData_2$Unit.price)
@@ -158,7 +180,7 @@ colnames(D_cost_country) = c('country', 'Expence_of_Prduct_Line')
 dev.off()
 windows()
 MPL_EX = ggplot(D_cost_country, aes(x = reorder(country, -Expence_of_Prduct_Line), y = Expence_of_Prduct_Line))+coord_cartesian(ylim = c(680, 725))
-MPL_EX = MPL_EX + geom_bar(stat="identity", color='blue',fill='blue')
+MPL_EX = MPL_EX + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MPL_EX = MPL_EX + theme(axis.text.x=element_text(angle=45, hjust=1))
 MPL_EX
 
@@ -176,7 +198,7 @@ colnames(D_cost_order) = c('Order_Method', 'Expence_of_Prduct_Line')
 dev.off()
 windows()
 MPL_EX_ME = ggplot(D_cost_order, aes(x = reorder(Order_Method, -Expence_of_Prduct_Line), y = Expence_of_Prduct_Line))+coord_cartesian(ylim = c(680, 715))
-MPL_EX_ME = MPL_EX_ME + geom_bar(stat="identity", color='blue',fill='blue')
+MPL_EX_ME = MPL_EX_ME + geom_bar(stat="identity", color='skyblue',fill='steelblue')
 MPL_EX_ME = MPL_EX_ME + theme(axis.text.x=element_text(angle=45, hjust=1))
 MPL_EX_ME
 
@@ -197,6 +219,7 @@ colnames(PL_2017)=c('Product_Line_Category', 'Total_Revenue_2017')
 
 PL_2018$Growth = (PL_2018$Total_Revenue_2018-PL_2017$Total_Revenue_2017)/PL_2017$Total_Revenue_2017
 
+
 #####Finding shares in each group for Product Line
 PL_2018$Share=PL_2018$Total_Revenue_2018/sum(PL_2018$Total_Revenue_2018)
 
@@ -208,12 +231,12 @@ a <- 1
 b <- 0.0000005
 z.cex <- a + b*z
  
-plot(PL_2018$Share, PL_2018$Growth,  pch=21, ylim = c(-0.36, -0.09), xlim = c(0, 0.4), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
+plot(PL_2018$Growth, PL_2018$Share, pch=21, xlim = c(-0.36, -0.09), ylim = c(0, 0.4), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
 grid()
-axis(1, at=seq(-0.4,1,0.05), pos=-0.35, col="black", lwd=3)
-axis(2, at=seq(-0.4,1,0.05), pos=0, col="black", lwd=3)
-text(PL_2018$Share, PL_2018$Growth,   PL_2018$Product_Line_Category,col="black", cex=0.9)
-title( main="BCG Matrix of Product Line ", xlab='Market Share', ylab='Market Growth', mgp=c(1,-1,0), cex=2)
+axis(1, at=seq(-0.4,1,0.05), pos=0, col="black", lwd=3)
+axis(2, at=seq(-0.4,1,0.05), pos=-0.35, col="black", lwd=3)
+text(PL_2018$Growth, PL_2018$Share,  PL_2018$Product_Line_Category,col="black", cex=0.9)
+title( main="BCG Matrix of Product Line ", xlab='Market Growth', ylab='Market Share', mgp=c(1,-1,0), cex=2)
 
 ############BCG Matrix for Product type########################
 P2=aggregate(MyData$Revenue_1, by=list(MyData$Product.type), sum)
@@ -241,12 +264,12 @@ a <- 1
 b <- 0.0000005
 z.cex <- a + b*z
 
-plot(PT_2018$Share, PT_2018$Growth,  pch=21, ylim = c(-0.42, 0.05), xlim = c(0.01, 0.1), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
+plot(PT_2018$Growth, PT_2018$Share, pch=21, xlim = c(-0.42, 0.05), ylim = c(0.01, 0.1), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
 grid()
-axis(2, at=seq(-1,1,0.1), pos=0.01, col="black", lwd=3)
-axis(1, at=seq(-1,1,0.1), pos=-0.2, col="black", lwd=3)
-text(PT_2018$Share, PT_2018$Growth, PT_2018$Product_Type_Category,col="black", cex=0.8)
-title( main="BCG Matrix of Product Type ", ylab='Market Growth', xlab='Market Share', mgp=c(1,-1,0), cex=2)
+axis(1, at=seq(-1,1,0.1), pos=0.01, col="black", lwd=3)
+axis(2, at=seq(-1,1,0.1), pos=-0.2, col="black", lwd=3)
+text(PT_2018$Growth, PT_2018$Share,  PT_2018$Product_Type_Category,col="black", cex=0.8)
+title( main="BCG Matrix of Product Type ", xlab='Market Growth', ylab='Market Share', mgp=c(1,-1,0), cex=2)
 
 ############BCG Matrix for Product########################
 P3=aggregate(MyData$Revenue_1, by=list(MyData$Product), sum)
@@ -274,12 +297,12 @@ a <- 1
 b <- 0.0000005
 z.cex <- a + b*z
 
-plot(PP_2018$Share, PP_2018$Growth, pch=21, ylim = c(-1, 1.2), xlim = c(0.000001, 0.013), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
+plot(PP_2018$Growth, PP_2018$Share, pch=21, xlim = c(-1, 1.2), ylim = c(0.000001, 0.013), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
 grid()
-axis(2, at=seq(-1,1.2,0.1), pos=0, col="black", lwd=3)
-axis(1, at=seq(-1,1,0.1), pos=-0, col="black", lwd=3)
-text(PP_2018$Share, PP_2018$Growth,  PP_2018$Product_Category,col="black", cex=0.8)
-title( main="BCG Matrix of Product ", ylab='Market Growth', xlab='Market Share', mgp=c(1,-1,0), cex=2)
+axis(1, at=seq(-1,1.2,0.1), pos=0, col="black", lwd=3)
+axis(2, at=seq(-1,1,0.1), pos=-0, col="black", lwd=3)
+text(PP_2018$Growth, PP_2018$Share,  PP_2018$Product_Category,col="black", cex=0.8)
+title( main="BCG Matrix of Product ", xlab='Market Growth', ylab='Market Share', mgp=c(1,-1,0), cex=2)
 
 
 ############BCG Matrix for Countries########################
@@ -308,12 +331,12 @@ a <- 1
 b <- 0.0000005
 z.cex <- a + b*z
 
-plot(PC_2018$Share, PC_2018$Growth,  pch=21, ylim = c(-0.45, 0.15), xlim = c(-0.001, 0.08), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
+plot(PC_2018$Growth, PC_2018$Share, pch=21, xlim = c(-0.45, 0.15), ylim = c(-0.001, 0.08), bg="green4", col="green4", cex=z.cex, lwd=2, bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
 grid()
-axis(2, at=seq(-0.5,0.2,0.1), pos=0, col="black", lwd=3)
-axis(1, at=seq(-0.001,0.08,0.01), pos=0, col="black", lwd=3)
-text( PC_2018$Share, PC_2018$Growth, PC_2018$Country_Category,col="black", cex=0.8)
-title( main="BCG Matrix of Country ", ylab='Market Growth', xlab='Market Share', mgp=c(1,-1,0), cex=2)
+axis(1, at=seq(-0.5,0.2,0.1), pos=0, col="black", lwd=3)
+axis(2, at=seq(-0.001,0.08,0.01), pos=0, col="black", lwd=3)
+text(PC_2018$Growth, PC_2018$Share,  PC_2018$Country_Category,col="black", cex=0.8)
+title( main="BCG Matrix of Country ", xlab='Market Growth', ylab='Market Share', mgp=c(1,-1,0), cex=2)
 
 ############BCG Matrix for Methods########################
 P5=aggregate(MyData$Revenue_1, by=list(MyData$Order.method.type), sum)
